@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Deciphering Animation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            font-family: 'Space Mono', monospace;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            position: relative;
+        }
+        
+        #text {
+            font-size: 3rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            min-height: 4rem;
+            margin-bottom: 2rem;
+            position: relative;
+            white-space: pre;
+        }
+        
+        .char {
+            display: inline-block;
+            position: relative;
+            transform-origin: center;
+            transition: all 0.2s ease;
+        }
+        
+        .char.space {
+            width: 0.5em;
+        }
+        
+        .controls {
+            margin-top: 40px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+        
+        .controls:hover {
+            opacity: 1;
+        }
+        
+        button {
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        .highlight {
+            color: #64ffda;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.7);
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        @keyframes wave {
+            0% { transform: translateY(0); }
+            25% { transform: translateY(-5px); }
+            50% { transform: translateY(0); }
+            75% { transform: translateY(5px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="text"></div>
+        <div class="controls">
+            <button id="startBtn"><i class="fas fa-sync-alt"></i> Decipher</button>
+            <button id="resetBtn"><i class="fas fa-redo"></i> Reset</button>
+        </div>
+    </div>
+
+    <script>
+        // Target text to decipher to - with proper spacing
+        const targetText = "Hi, Nemo this side :)";
+        
+        // Character sets for random characters (minimal set for cleaner look)
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+        
+        // Reference to the text element
+        const textElement = document.getElementById('text');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        let isDeciphering = false;
+        let intervalId = null;
+        let charElements = [];
+        
+        // Function to generate a random character
+        function getRandomChar() {
+            return chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        
+        // Function to initialize the text field with individual span elements
+        function initializeText() {
+            textElement.innerHTML = '';
+            charElements = [];
+            
+            for (let i = 0; i < targetText.length; i++) {
+                const charSpan = document.createElement('span');
+                charSpan.className = 'char';
+                
+                // Special handling for spaces
+                if (targetText[i] === ' ') {
+                    charSpan.className = 'char space';
+                    charSpan.innerHTML = '&nbsp;';
+                } else {
+                    charSpan.textContent = getRandomChar();
+                }
+                
+                // Add random initial transformation
+                charSpan.style.transform = `
+                    translateY(${Math.random() * 20 - 10}px)
+                    rotateX(${Math.random() * 40 - 20}deg)
+                    rotateY(${Math.random() * 40 - 20}deg)
+                    scale(${0.8 + Math.random() * 0.4})
+                `;
+                charSpan.style.opacity = '0.7';
+                
+                textElement.appendChild(charSpan);
+                charElements.push(charSpan);
+            }
+            
+            // Apply initial wave animation
+            applyWaveEffect();
+        }
+        
+        // Function to apply wave effect to characters
+        function applyWaveEffect() {
+            charElements.forEach((char, i) => {
+                char.style.animation = `wave 2s ease-in-out infinite`;
+                char.style.animationDelay = `${i * 0.05}s`;
+            });
+        }
+        
+        // Function to make characters float after deciphering
+        function applyFloatEffect() {
+            charElements.forEach((char, i) => {
+                char.style.animation = `float 3s ease-in-out infinite`;
+                char.style.animationDelay = `${i * 0.08}s`;
+            });
+        }
+        
+        // Function to decipher the text
+        function decipherText() {
+            if (isDeciphering) return;
+            
+            isDeciphering = true;
+            let positions = [];
+            
+            // Create array of positions to be deciphered
+            for (let i = 0; i < targetText.length; i++) {
+                positions.push(i);
+            }
+            
+            // Shuffle the positions for random deciphering effect
+            positions.sort(() => Math.random() - 0.5);
+            
+            let index = 0;
+            let scrambleCount = 5; // How many times to scramble before settling
+            
+            // Start deciphering with random intervals
+            intervalId = setInterval(() => {
+                if (index >= positions.length) {
+                    clearInterval(intervalId);
+                    isDeciphering = false;
+                    
+                    // Apply floating effect to final text
+                    setTimeout(() => {
+                        charElements.forEach(char => {
+                            char.style.transform = 'translateY(0) rotateX(0) rotateY(0) scale(1)';
+                            char.style.opacity = '1';
+                            if (!char.classList.contains('space')) {
+                                char.classList.add('highlight');
+                            }
+                        });
+                        applyFloatEffect();
+                    }, 300);
+                    
+                    return;
+                }
+                
+                const pos = positions[index];
+                
+                // Skip animation for spaces
+                if (targetText[pos] === ' ') {
+                    charElements[pos].innerHTML = '&nbsp;';
+                    charElements[pos].style.transform = 'translateY(0) rotateX(0) rotateY(0) scale(1)';
+                    charElements[pos].style.opacity = '1';
+                    index++;
+                    return;
+                }
+                
+                // Scramble effect - rapidly change characters before settling
+                let scrambleIteration = 0;
+                const scrambleInterval = setInterval(() => {
+                    if (scrambleIteration >= scrambleCount) {
+                        clearInterval(scrambleInterval);
+                        
+                        // Set the final character
+                        charElements[pos].textContent = targetText[pos];
+                        charElements[pos].style.transform = 'translateY(0) rotateX(0) rotateY(0) scale(1)';
+                        charElements[pos].style.opacity = '1';
+                        
+                        // Add momentary highlight effect
+                        charElements[pos].classList.add('highlight');
+                        setTimeout(() => {
+                            charElements[pos].classList.remove('highlight');
+                        }, 500);
+                        
+                        return;
+                    }
+                    
+                    charElements[pos].textContent = getRandomChar();
+                    scrambleIteration++;
+                }, 50);
+                
+                index++;
+            }, 150); // Speed of deciphering
+        }
+        
+        // Initialize the text on page load
+        initializeText();
+        
+        // Event listeners for buttons
+        startBtn.addEventListener('click', () => {
+            if (isDeciphering) return;
+            resetAnimation();
+            setTimeout(decipherText, 300);
+        });
+        
+        resetBtn.addEventListener('click', resetAnimation);
+        
+        function resetAnimation() {
+            if (intervalId) clearInterval(intervalId);
+            isDeciphering = false;
+            
+            charElements.forEach(char => {
+                char.classList.remove('highlight');
+                char.style.animation = 'none';
+                char.offsetHeight; // Force reflow
+            });
+            
+            initializeText();
+        }
+        
+        // Auto-start animation after a short delay
+        setTimeout(decipherText, 1000);
+    </script>
+</body>
+</html>

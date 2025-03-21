@@ -1,0 +1,281 @@
+@keyframes wave {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  :root {
+    --blue-primary: #4a6cf7;
+    --purple-primary: #a855f7;
+    --blue-purple-gradient: linear-gradient(to right, var(--blue-primary), var(--purple-primary));
+    --blue-purple-gradient-reverse: linear-gradient(to left, var(--blue-primary), var(--purple-primary));
+    --blue-purple-gradient-diagonal: linear-gradient(135deg, var(--blue-primary), var(--purple-primary));
+
+    /* Override primary color variables to use our gradient theme */
+    --primary: var(--blue-primary);
+    --primary-foreground: white;
+
+    /* Light mode specific colors */
+    --background: #f8fafc;
+    --foreground: #1e293b;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --nav-bg: rgba(255, 255, 255, 0.8);
+  }
+
+  .dark {
+    --seagreen-primary: #00ffa3;
+    --teal-primary: #4aeadc;
+    --seagreen-neon-primary: var(--seagreen-primary);
+    --seagreen-neon-gradient: linear-gradient(to right, var(--seagreen-primary), var(--teal-primary));
+    --seagreen-neon-gradient-reverse: linear-gradient(to left, var(--seagreen-primary), var(--teal-primary));
+    --seagreen-neon-gradient-diagonal: linear-gradient(135deg, var(--seagreen-primary), var(--teal-primary));
+
+    /* Override primary color variables for dark mode */
+    --primary: var(--seagreen-primary);
+    --primary-foreground: black;
+
+    /* Dark mode specific colors */
+    --background: #0f172a;
+    --foreground: #e2e8f0;
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    --nav-bg: rgba(15, 23, 42, 0.8);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    @apply bg-primary/30;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/50;
+  }
+}
+
+@layer components {
+  .ai-tag {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .ml-tag {
+    @apply bg-primary/20 text-primary;
+  }
+
+  .django-tag {
+    @apply bg-primary/30 text-primary;
+  }
+
+  /* Text glow effect */
+  .text-glow {
+    @apply transition-all duration-200;
+    text-shadow: 0 0 8px rgba(74, 108, 247, 0.5);
+    filter: brightness(1.2);
+    color: var(--blue-primary);
+  }
+
+  .dark .text-glow {
+    text-shadow: 0 0 12px rgba(0, 255, 163, 0.7);
+    filter: brightness(1.5);
+    color: var(--seagreen-primary);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: var(--blue-purple-gradient);
+    @apply bg-clip-text text-transparent font-medium;
+  }
+
+  .dark .gradient-text {
+    background: var(--seagreen-neon-gradient);
+    @apply bg-clip-text text-transparent font-medium;
+  }
+
+  /* Animation keyframes for DecodeText component */
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-5px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  @keyframes wave {
+    0% {
+      transform: translateY(0);
+    }
+
+    25% {
+      transform: translateY(-3px);
+    }
+
+    50% {
+      transform: translateY(0);
+    }
+
+    75% {
+      transform: translateY(3px);
+    }
+
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  /* Character styling for decode effect */
+  .char {
+    @apply inline-block relative;
+    transform-origin: center;
+    transition: all 0.2s ease;
+  }
+
+  .char.space {
+    width: 0.5em;
+  }
+
+  /* Decode effect */
+  .decode-effect {
+    @apply relative;
+  }
+
+  /* Hello text */
+  .hello-text {
+    @apply gradient-text;
+  }
+
+  /* Gradient buttons */
+  .gradient-btn {
+    @apply relative overflow-hidden rounded-md;
+    background: var(--blue-purple-gradient);
+  }
+
+  .dark .gradient-btn {
+    background: var(--seagreen-neon-gradient);
+  }
+
+  .gradient-btn::before {
+    content: "";
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: var(--blue-purple-gradient-reverse);
+  }
+
+  .dark .gradient-btn::before {
+    background: var(--seagreen-neon-gradient-reverse);
+  }
+
+  .gradient-btn:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Border gradient effect */
+  .border-gradient {
+    @apply relative rounded-md border-transparent;
+    background: linear-gradient(to right, var(--blue-primary), var(--purple-primary), var(--blue-primary));
+    background-size: 200% 100%;
+    animation: border-flow 3s linear infinite;
+  }
+
+  .dark .border-gradient {
+    background: linear-gradient(to right, var(--seagreen-primary), var(--teal-primary), var(--seagreen-primary));
+    background-size: 200% 100%;
+    animation: border-flow 3s linear infinite;
+  }
+
+  @keyframes border-flow {
+    0% {
+      background-position: 0% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Card with gradient hover effect */
+  .gradient-card {
+    @apply transition-all duration-300 border border-border bg-card rounded-lg p-6;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .gradient-card::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    @apply opacity-0 transition-opacity duration-300;
+    background: var(--blue-purple-gradient-diagonal);
+  }
+
+  .dark .gradient-card::before {
+    background: var(--seagreen-neon-gradient-diagonal);
+  }
+
+  .gradient-card:hover::before {
+    @apply opacity-10;
+  }
+
+  .gradient-card:hover {
+    @apply border-primary/50;
+  }
+
+  /* Gradient bar */
+  .gradient-bar {
+    background: var(--blue-purple-gradient);
+  }
+
+  .dark .gradient-bar {
+    background: var(--seagreen-neon-gradient);
+  }
+
+  /* Progress fill gradient */
+  .gradient-progress-fill {
+    background: var(--blue-purple-gradient);
+  }
+
+  .dark .gradient-progress-fill {
+    background: var(--seagreen-neon-gradient);
+  }
+}
